@@ -1,24 +1,206 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+﻿<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="~/Content/Article.css">
+</head>
+
+<div class="container_row">
+    <div id="tableBlock"></div>
+    <div id="editBlock">
+        <p><b>Edit article</b></p>
+        <table>
+            <tr><td><input type="hidden" id="editId" /></td><td></td></tr>
+            <tr><td><label>Title: </label></td><td><input type="text" id="editTitle" /></td></tr>
+            <tr><td><label>SubTitle: </label></td><td><input type="text" id="editSubTitle" /></td></tr>
+            <tr><td><label>Body: </label></td><td><input type="text" id="editBody" /></td></tr>
+            <tr><td><label>Image: </label></td><td><input type="text" id="editImage" /></td></tr>
+            <tr><td><label>AutorId: </label></td><td><input type="text" id="editAutorId" /></td></tr>
+            <tr><td><label>Date: </label></td><td><input type="text" id="editDate" /></td></tr>
+            <tr><td><label>Is active: </label></td><td><input type="checkbox" id="editIsActive" /></td></tr>
+        </table>
+        <button id="editArticle">Сохранить</button>
+        <button id="editArticleCancel">Отменить</button>
+    </div>
+    <div id="createBlock">
+        <p><b>Add article</b></p>
+        <table>
+            <tr><td><label>Title: </label></td><td><input type="text" id="addTitle" /></td></tr>
+            <tr><td><label>SubTitle: </label></td><td><input type="text" id="addSubTitle" /></td></tr>
+            <tr><td><label>Body: </label></td><td><input type="text" id="addBody" /></td></tr>
+            <tr><td><label>Image: </label></td><td><input type="text" id="addImage" /></td></tr>
+            <tr><td><label>AutorId: </label></td><td><input type="text" id="addAutorId" /></td></tr>
+            <tr><td><label>Date: </label></td><td><input type="text" id="addDate" /></td></tr>
+            <tr><td><label>Is active: </label></td><td><input type="checkbox" id="addIsActive" /></td></tr>
+        </table>
+        <button id="addArticle">Сохранить</button>
+    </div>
 </div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-    </div>
-</div>
+@section scripts
+{
+    <script type="text/javascript">
+        // инициализация страницы
+        $(document).ready(function () {
+
+            GetAllArticles();
+
+            $("#editArticle").click(function (event) {
+                event.preventDefault();
+                editArticle();
+            });
+
+            $("#addArticle").click(function (event) {
+                event.preventDefault();
+                addArticle();
+            });
+            $("#editArticleCancel").click(function (event) {
+                event.preventDefault();
+                GetAllArticles();
+            });
+
+
+        });
+        // Получение всех статей по ajax-запросу
+        function GetAllArticles() {
+
+            $("#createBlock").css('display', 'block');
+            $("#editBlock").css('display', 'none');
+            $.ajax({
+                url: '/api/Article/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    WriteResponse(data);
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+        // Добавление новой статьи
+        function addArticle() {
+            // получаем значения для добавляемой статьи
+            var article = {
+                Title: $('#addTitle').val(),
+                SubTitle: $('#addSubTitle').val(),
+                Body: $('#addBody').val(),
+                Image: $('#addImage').val(),
+                AutorId: $('#addAutorId').val(),
+                Date: $('#addDate').val(),
+                IsActive: $('#addIsActive').val()
+            };
+
+            $.ajax({
+                url: '/api/Article/',
+                type: 'POST',
+                data: JSON.stringify(article),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    GetAllArticles();
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+        // Удаление статьи
+        function DeleteArticle(id) {
+            $.ajax({
+                url: '/api/Article/' + id,
+                type: 'DELETE',
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    GetAllArticles();
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+        // редактирование статьи
+        function editArticle() {
+            var id = $('#editId').val()
+            // получаем новые значения для редактируемой статьи
+            var book = {
+                Id: $('#editId').val(),
+                Title: $('#editTitle').val(),
+                SubTitle: $('#editSubTitle').val(),
+                Body: $('#editBody').val(),
+                Image: $('#editImage').val(),
+                AutorId: $('#editAutorId').val(),
+                Date: $('#editDate').val(),
+                IsActive: $('#editIsActive').val()
+            };
+            $.ajax({
+                url: '/api/Article/' + id,
+                type: 'PUT',
+                data: JSON.stringify(book),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    GetAllArticles();
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+        // вывод полученных данных на экран
+        function WriteResponse(books) {
+            var strResult = "<table><th>ID</th><th>Title</th><th>SubTitle</th><th>Body</th>";
+            $.each(books, function (index, article) {
+                strResult += "<tr><td>" + article.Id + "</td><td> " + article.Title + "</td><td>" +
+                    article.SubTitle + "</td><td>" + article.Body + "</td><td>" + "<img src=" + article.Image +
+                    //"height=" + "42" +
+                    "></img></td > <td>" + article.AuthorId + "</td> <td>" + article.Date +
+                        "</td><td>" + article.IsActive +
+                        "</td><td><a id='editItem' data-item='" + article.Id + "' onclick='EditItem(this);' >Редактировать</a></td>" +
+                        "<td><a id='delItem' data-item='" + article.Id + "' onclick='DeleteItem(this);' >Удалить</a></td></tr>";
+            });
+            strResult += "</table>";
+            $("#tableBlock").html(strResult);
+
+        }
+        // обработчик удаления
+        function DeleteItem(el) {
+            // получаем id удаляемого объекта
+            var id = $(el).attr('data-item');
+            DeleteArticle(id);
+        }
+        // обработчик редактирования
+        function EditItem(el) {
+            // получаем id редактируемого объекта
+            var id = $(el).attr('data-item');
+            GetArticle(id);
+        }
+        // вывод данных редактируемой статьи в поля для редактирования
+        function ShowBook(article) {
+            if (article != null) {
+                $("#createBlock").css('display', 'none');
+                $("#editBlock").css('display', 'block');
+                $("#editId").val(article.Id);
+                $("#editTitle").val(article.Title);
+                $("#editSubTitle").val(article.SubTitle);
+                $("#editBody").val(article.Body);
+                $("#editImage").val(article.Image);
+                $("#editAutorId").val(article.AuthorID);
+                $("#editDate").val(article.Date);
+                $("#editIsActive").val(article.IsActive);
+            }
+            else {
+                alert("Такая статья не существует");
+            }
+        }
+        // запрос статьи на редактирование
+        function GetArticle(id) {
+            $.ajax({
+                url: '/api/Article/' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    ShowBook(data);
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+    </script>
+}

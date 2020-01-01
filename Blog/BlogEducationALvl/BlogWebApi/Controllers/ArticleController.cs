@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BlogBL;
+using BlogBL.BLModels;
 using BlogWebApi.Models;
 using System;
 using System.Collections.Generic;
@@ -15,15 +16,26 @@ namespace BlogWebApi.Controllers
         private readonly IArticleService _articleService;
         private readonly IMapper _mapper;
 
+        public ArticleController()
+        {
+
+        }
         public ArticleController(IArticleService articleService, IMapper mapper)
         {
             _articleService = articleService;
             _mapper = mapper;
         }
         // GET: api/Article
-        public IEnumerable<string> Get()
+        public IEnumerable<ArticleModel> Get()
         {
-            return new string[] { "value1", "value2" };
+            var allArticlesBL = _articleService.GetAll();
+            ICollection<ArticleModel> allArticleView = new List<ArticleModel>();
+            foreach (var articleBL in allArticlesBL)
+            {
+                var articleModel = _mapper.Map<ArticleModel>(articleBL);
+                allArticleView.Add(articleModel);
+            }
+            return allArticleView;
         }
 
         // GET: api/Article/5
@@ -35,18 +47,32 @@ namespace BlogWebApi.Controllers
         }
 
         // POST: api/Article
-        public void Post([FromBody]string value)
+        [HttpPost]
+        public void Post([FromBody]ArticleModel newArticle)
         {
+            var newBLArticle = _mapper.Map<ArticleBL>(newArticle);
+            _articleService.AddItem(newBLArticle);
         }
 
         // PUT: api/Article/5
-        public void Put(int id, [FromBody]string value)
+        [HttpPut]
+        public void Put(int id, [FromBody]ArticleModel editedArticle)
         {
+            if (id==editedArticle.Id)
+            {
+                var editedBLArticle = _mapper.Map<ArticleBL>(editedArticle);
+                _articleService.Update(editedBLArticle);
+            }
         }
 
         // DELETE: api/Article/5
         public void Delete(int id)
         {
+            var articleToDeleteBL = _articleService.FindById(id);
+            if (articleToDeleteBL!=null)
+            {
+                _articleService.Delete(articleToDeleteBL);
+            }
         }
     }
 }

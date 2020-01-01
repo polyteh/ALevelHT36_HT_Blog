@@ -11,8 +11,6 @@ namespace BlogBL
         {
             CreateMap<ArticleBL, Article>().ReverseMap();
             CreateMap<CommentBL, Comment>().ReverseMap();
-     
-
         }
     }
         

@@ -30,7 +30,8 @@ namespace BlogDAL.Repository
 
         public int Create(T item)
         {
-            throw new NotImplementedException();
+            _db.Insert(item);
+            return 1;
         }
 
         public void CreateBulk(IEnumerable<T> items)
@@ -80,12 +81,12 @@ namespace BlogDAL.Repository
 
         public void Remove(T item)
         {
-            throw new NotImplementedException();
+            _db.Delete(item);
         }
 
         public void Update(T item)
         {
-            throw new NotImplementedException();
+            _db.Update(item);
         }
     }
 }

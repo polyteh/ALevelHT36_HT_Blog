@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BlogBL;
+using BlogBL.BLModels;
 using BlogEducationALvl.Models;
 using System.Collections.Generic;
 using System.Web.Mvc;
@@ -54,33 +55,49 @@ namespace BlogEducationALvl.Controllers
 
         // POST: Article/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        //public ActionResult Create(FormCollection collection)
+        public ActionResult Create(ArticleModel newArticle)
         {
-            try
-            {
-                // TODO: Add insert logic here
-
+            //try
+            //{
+            //    // TODO: Add insert logic here
+            //    var newBLArticle = _mapper.Map<ArticleBL>(newArticle);
+            //    _articleService.AddItem(newBLArticle);
+            //    return RedirectToAction("Index");
+            //}
+            //catch
+            //{
+            //    return View();
+            //}
+            if (ModelState.IsValid) {
+                var newBLArticle = _mapper.Map<ArticleBL>(newArticle);
+                _articleService.AddItem(newBLArticle);
                 return RedirectToAction("Index");
             }
-            catch
+            else
             {
-                return View();
+                ViewBag.Message = "Not Valid";
+                return View(newArticle);
             }
         }
 
         // GET: Article/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var articleBL = _articleService.FindById(id);
+            var article = _mapper.Map<ArticleModel>(articleBL);
+            return View(article);
         }
 
         // POST: Article/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        //public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(ArticleModel editedArticle)
         {
             try
             {
-                // TODO: Add update logic here
+                var editedBLArticle = _mapper.Map<ArticleBL>(editedArticle);
+                _articleService.Update(editedBLArticle);
 
                 return RedirectToAction("Index");
             }
@@ -93,16 +110,22 @@ namespace BlogEducationALvl.Controllers
         // GET: Article/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var articleBL = _articleService.FindById(id);
+            var articleToDelete = _mapper.Map<ArticleModel>(articleBL);
+            return View(articleToDelete);
         }
 
         // POST: Article/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(ArticleModel deletedArticle)
         {
             try
             {
-                // TODO: Add delete logic here
+                var articleDeleteBL = _articleService.FindById(deletedArticle.Id);
+                if (articleDeleteBL!=null)
+                {
+                    _articleService.Delete(articleDeleteBL);
+                }
 
                 return RedirectToAction("Index");
             }

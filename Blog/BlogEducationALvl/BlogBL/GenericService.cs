@@ -9,6 +9,9 @@ namespace BlogBL
     {
         BLModel FindById(int id);
         IEnumerable<BLModel> GetAll();
+        void AddItem(BLModel newBLModel);
+        void Update(BLModel updateItem);
+        void Delete(BLModel deleteItem);
     }
 
     public abstract class GenericService<BLModel, DModel> : IGenereicService<BLModel>
@@ -19,6 +22,18 @@ namespace BlogBL
         public GenericService(IGenericRepository<DModel> repository)
         { 
             _repositroy = repository;
+        }
+
+        public void AddItem(BLModel newBLModel)
+        {
+            DModel newDLModel = Map(newBLModel);
+            _repositroy.Create(newDLModel);
+        }
+
+        public void Delete(BLModel deleteItem)
+        {
+            DModel deleteDLModel = Map(deleteItem);
+            _repositroy.Remove(deleteDLModel);
         }
 
         public virtual BLModel FindById(int id)
@@ -43,5 +58,11 @@ namespace BlogBL
 
         public abstract IEnumerable<BLModel> Map(IList<DModel> entity);
         public abstract IEnumerable<DModel> Map(IList<BLModel> entity);
+
+        public void Update(BLModel updateBLItem)
+        {
+            DModel updateDLModel = Map(updateBLItem);
+            _repositroy.Update(updateDLModel);
+        }
     }
 }

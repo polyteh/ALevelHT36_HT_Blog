@@ -5,6 +5,7 @@ using LightInject.Mvc;
 using LightInject.WebApi;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Web.Http;
 using System.Web.Mvc;
 
 namespace BlogWebApi.App_Start
@@ -13,8 +14,9 @@ namespace BlogWebApi.App_Start
     {
         public static void Congigurate()
         {
-            var container = new ServiceContainer();
-            container.RegisterControllers(Assembly.GetExecutingAssembly());
+            var container = new ServiceContainer();//mvc
+            container.RegisterApiControllers(Assembly.GetExecutingAssembly());
+           // container.RegisterControllers(Assembly.GetExecutingAssembly());//rem
 
             container.EnablePerWebRequestScope();
 
@@ -28,7 +30,10 @@ namespace BlogWebApi.App_Start
             container.Register<IArticleService, ArticleService>();
             //var resolver = new LightInjectWebApiDependencyResolver(container);             
             //DependencyResolver.SetResolver(new LightInjectMvcDependencyResolver(container));
-            container.EnableMvc();
+
+            //container.EnableMvc();//rem
+            container.EnablePerWebRequestScope();
+            container.EnableWebApi(GlobalConfiguration.Configuration);
 
         }
     }
